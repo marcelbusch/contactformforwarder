@@ -11,12 +11,14 @@ const port = process.env.PORT;
 const apikey = process.env.APIKEY;
 
 app.post('/contactformsubmit', async (req, res) => {
+  console.log(req.body)
   if (!req.body || !req.body.apikey || !req.body.apikey == apikey) {
     res.send('apikey missing or incorrect');
     return;
   }
 
   const success = await sendmail(req.body).catch(console.error);
+  console.log(`success: ${success ? 'true' : 'false'}`)
   if (success === true) {
     res.send("success")
   } else {
@@ -24,13 +26,13 @@ app.post('/contactformsubmit', async (req, res) => {
   }
 });
 
-app.listen(port, '0.0.0.0', () => {
+app.listen(port, () => {
   console.log(`Contact form forwarding server listening on port ${port}`);
 });
 
 
 const transporter = nodemailer.createTransport({
-  host: process.env.MAILPORT,
+  host: process.env.MAILSERVER,
   port: process.env.MAILPORT,
   secure: true,
   auth: {
@@ -40,6 +42,8 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendmail(data) {
+  console.log(data)
+  console.log(transporter)
   const info = await transporter.sendMail({
     from: `"Kontaktformular" <${process.env.MAILUSER}>`, // sender address
     to: 'me@marcelbusch.de', // list of receivers

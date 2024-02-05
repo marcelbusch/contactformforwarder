@@ -1,0 +1,17 @@
+{
+  "name": "mailserver",
+  "version": "0.0.1",
+  "description": "simple server which takes rest/post requests from forms and sends emails with the content",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.9"
+  }
+}

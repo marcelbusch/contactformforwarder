@@ -15,6 +15,7 @@ MAILPASS="xxx"
 MAILUSER=my@mail.address
 MAILPORT=465
 MAILSERVER=smtp.mail.server
+SENDTO=receiving@email.adress
 MESSAGE_TEMPLATE="replaces #var# with json body.var"
 SUBJECT_TEMPLATE="replaces #var# with json body.var"
 MESSAGE_TEMPLATE_VAR="if you want multiple templates, send a body.template = \"VAR\" variable"

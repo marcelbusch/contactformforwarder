@@ -20,17 +20,17 @@ app.post('/contactformsubmit', async (req, res) => {
   //   res.send('only send json');
   //   return;
   // }
-  console.log(body)
-  console.log(!!body)
-  console.log(Object.keys(body))
-  console.log(Object.keys(body).length)
+  // console.log(body)
+  // console.log(!!body)
+  // console.log(Object.keys(body))
+  // console.log(Object.keys(body).length)
   if (!body || !Object.keys(body).length) {
     console.log(`res.body is empty. request:`);
     console.log(req)
     res.send('only send json');
     return;
   }
-  console.log(body);
+  // console.log(body);
   if (!body || !body.apikey || !body.apikey == apikey) {
     res.send('apikey missing or incorrect');
     return;
@@ -66,6 +66,7 @@ const transporter = nodemailer.createTransport({
 });
 
 function createMessage(data, template) {
+  // console.log(template, data)
   if (!template) {
     let message = '';
     for (const key in data) {

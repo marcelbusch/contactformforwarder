@@ -31,6 +31,24 @@ var2: value2
 ...
 ```
 
+## Send Messages
+
+### How to send messages
+
+Send a POST request to `{example.tld}/contactformsubmit` with a JSON body, containing either:
+
+#### Template var
+
+if `body.template` is set, `MESSAGE_TEMPLATE_${body.template}` will be used as a template and all variables in the body will be replaced in the template
+
+#### Send `message` and `subject`
+
+if `body.message` and `body.subject` are set, they are used without any altering as message body and subject
+
+#### Singleton template [DEPRECATED]
+
+you can send an object in `body.singletontemplate` containing a `subject` and `body` template in the same form as the env var templates
+
 ## Deploy
 
 ### Uberspace

@@ -10,6 +10,11 @@ app.use(express.json());
 const port = process.env.PORT;
 const apikey = process.env.APIKEY;
 
+app.post('/log', async (req, res) => {
+  console.log(req?.body)
+  res.send('success')
+})
+
 app.post('/contactformsubmit', async (req, res) => {
   let body = req.body;
   // console.log(req);
@@ -83,22 +88,26 @@ function createMessage(data, template) {
 }
 
 async function sendmail(data) {
-  console.log(data);
-  console.log(transporter);
+  // console.log(data);
+  // console.log(transporter);
   delete data.apikey;
-  const msgtmplt = data.template && process.env.hasOwnProperty(`MESSAGE_TEMPLATE_${data.template}`) ? process.env[`MESSAGE_TEMPLATE_${data.template}`] : process.env.MESSAGE_TEMPLATE
-  const sbjttmplt = data.template && process.env.hasOwnProperty(`SUBJECT_TEMPLATE_${data.template}`) ? process.env[`SUBJECT_TEMPLATE_${data.template}`] : process.env.SUBJECT_TEMPLATE
+  const messagetemplate = data.template && process.env.hasOwnProperty(`MESSAGE_TEMPLATE_${data.template}`) ? process.env[`MESSAGE_TEMPLATE_${data.template}`] : process.env.MESSAGE_TEMPLATE
+  const subjecttemplate = data.template && process.env.hasOwnProperty(`SUBJECT_TEMPLATE_${data.template}`) ? process.env[`SUBJECT_TEMPLATE_${data.template}`] : process.env.SUBJECT_TEMPLATE
   if (data.hasOwnProperty('template')) {
     delete data.template
   }
-  const message = createMessage(data, msgtmplt);
-  const subject = createMessage(data, sbjttmplt ? sbjttmplt : data.hasOwnProperty('name') ? 'Kontaktformular von #name#' : 'Kontaktformular');
-  const info = await transporter.sendMail({
+  const message = createMessage(data, messagetemplate);
+  const subject = createMessage(data, subjecttemplate ? subjecttemplate : data.hasOwnProperty('name') ? 'Kontaktformular von #name#' : 'Kontaktformular');
+  const msgdata = {
     from: `"Kontaktformular" <${process.env.MAILUSER}>`, // sender address
     to: process.env.SENDTO, // list of receivers
     subject: subject, // Subject line
     text: message, // plain text body
-  });
+  };
+  if (data.email) {
+    msgdata.replyTo = data.email
+  }
+  const info = await transporter.sendMail(msgdata);
 
   console.log('Message sent: %s', info.messageId);
   return true;

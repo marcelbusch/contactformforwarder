@@ -91,8 +91,21 @@ async function sendmail(data) {
   // console.log(data);
   // console.log(transporter);
   delete data.apikey;
-  const messagetemplate = data.template && process.env.hasOwnProperty(`MESSAGE_TEMPLATE_${data.template}`) ? process.env[`MESSAGE_TEMPLATE_${data.template}`] : process.env.MESSAGE_TEMPLATE
-  const subjecttemplate = data.template && process.env.hasOwnProperty(`SUBJECT_TEMPLATE_${data.template}`) ? process.env[`SUBJECT_TEMPLATE_${data.template}`] : process.env.SUBJECT_TEMPLATE
+  let messagetemplate, subjecttemplate;
+  if (data.template) {
+    messagetemplate = process.env.hasOwnProperty(`MESSAGE_TEMPLATE_${data.template}`) ? process.env[`MESSAGE_TEMPLATE_${data.template}`] : null;
+    subjecttemplate = process.env.hasOwnProperty(`SUBJECT_TEMPLATE_${data.template}`) ? process.env[`SUBJECT_TEMPLATE_${data.template}`] : null;
+
+  } else if(data.singletontemplate && data.singletontemplate.hasOwnProperty('body') && data.singletontemplate.hasOwnProperty('subject')) {
+    messagetemplate = data.singletontemplate.body;
+    subjecttemplate = data.singletontemplate.subject;
+  } else {
+    messagetemplate = null;
+    subjecttemplate = null;
+  }
+  if (data.singletontemplate) {
+    delete data.singletontemplate;
+  }
   if (data.hasOwnProperty('template')) {
     delete data.template
   }

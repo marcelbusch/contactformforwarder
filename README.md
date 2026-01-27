@@ -49,6 +49,10 @@ if `body.message` and `body.subject` are set, they are used without any altering
 
 you can send an object in `body.singletontemplate` containing a `subject` and `body` template in the same form as the env var templates
 
+### Send confirmation
+
+if `body.confirmation` is set to either a string containing an email address or an object containing `email`, `message`, `subject`.
+
 ## Deploy
 
 ### Uberspace

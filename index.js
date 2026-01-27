@@ -147,5 +147,32 @@ async function sendmail(data) {
   const info = await transporter.sendMail(msgdata);
   console.log("Message sent: %s", info.messageId);
 
+  if (data.confirmation) {
+    let send = true;
+    const confirmation = data.confirmation;
+    msgdata.replyTo = process.env.SENDTO;
+    if (typeof confirmation === "string") {
+      msgdata.to = confirmation;
+    } else if (
+      typeof confirmation === "object" &&
+      "email" in confirmation &&
+      "message" in confirmation &&
+      "subject" in confirmation
+    ) {
+      msgdata.to = confirmation.email;
+      msgdata.subject = confirmation.subject;
+      msgdata.text = confirmation.message;
+      if (confirmation?.replyTo) {
+        msgdata.replyTo = confirmation.replyTo;
+      }
+    } else {
+      send = false;
+    }
+    if (send === true) {
+      const confirmationInfo = await transporter.sendMail(msgdata);
+      console.log('confirmation sent info:', confirmationInfo)
+    }
+  }
+
   return true;
 }

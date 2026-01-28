@@ -11,6 +11,7 @@ Options set via `.env` file:
 ```sh
 APIKEY=xxx
 PORT=3000
+CORS=https://mydomain.com http://localhost:3000
 MAILPASS="xxx"
 MAILUSER=my@mail.address
 MAILPORT=465

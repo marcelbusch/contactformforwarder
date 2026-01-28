@@ -3,8 +3,18 @@ const nodemailer = require("nodemailer");
 const cors = require("cors");
 require("dotenv").config();
 
+import DOMPurify from "isomorphic-dompurify";
+
 const app = express();
-app.use(cors());
+if (process.env.CORS) {
+  const origin = process.env.CORS.split(' ')
+  console.log('cors origin:', origin)
+  app.use(cors({
+    origin: origin
+  }))
+} else {
+  app.use(cors());
+}
 app.use(express.json());
 
 const port = process.env.PORT;
@@ -36,7 +46,7 @@ app.post("/contactformsubmit", async (req, res) => {
     return;
   }
   // console.log(body);
-  if (!body || !body.apikey || !body.apikey == apikey) {
+  if (!body || !body.apikey || !body.apikey === apikey) {
     res.send("apikey missing or incorrect");
     return;
   }
@@ -134,15 +144,15 @@ async function sendmail(data) {
           : "Kontaktformular",
     );
   }
-  const sendto = data?.to || process.env.SENDTO;
+  const sendto = process.env.ENVIRONMENT === 'DEVELOPMENT' && data?.to || process.env.SENDTO;
   const msgdata = {
     from: `"Kontaktformular" <${process.env.MAILUSER}>`, // sender address
     to: sendto, // list of receivers
-    subject: subject, // Subject line
-    text: message, // plain text body
+    subject: DOMPurify.sanitize(subject), // Subject line
+    text: DOMPurify.sanitize(message), // plain text body
   };
   if (data.email) {
-    msgdata.replyTo = data.email;
+    msgdata.replyTo = DOMPurify.sanitize(data.email);
   }
   const info = await transporter.sendMail(msgdata);
   console.log("Message sent: %s", info.messageId);
@@ -152,18 +162,18 @@ async function sendmail(data) {
     const confirmation = data.confirmation;
     msgdata.replyTo = process.env.SENDTO;
     if (typeof confirmation === "string") {
-      msgdata.to = confirmation;
+      msgdata.to = DOMPurify.sanitize(confirmation);
     } else if (
       typeof confirmation === "object" &&
       "email" in confirmation &&
       "message" in confirmation &&
       "subject" in confirmation
     ) {
-      msgdata.to = confirmation.email;
-      msgdata.subject = confirmation.subject;
-      msgdata.text = confirmation.message;
+      msgdata.to = DOMPurify.sanitize(confirmation.email);
+      msgdata.subject = DOMPurify.sanitize(confirmation.subject);
+      msgdata.text = DOMPurify.sanitize(confirmation.message);
       if (confirmation?.replyTo) {
-        msgdata.replyTo = confirmation.replyTo;
+        msgdata.replyTo = DOMPurify.sanitize(confirmation.replyTo);
       }
     } else {
       send = false;

@@ -56,6 +56,22 @@ if `body.confirmation` is set to either a string containing an email address or 
 
 ## Deploy
 
+### Docker
+
+Images are built for `linux/amd64` and tagged `:latest` and `:<VERSION>`; the registry is set via `image` in the `justfile`. Log in to the registry once with `docker login <registry>`.
+
+```sh
+just build    # build the image locally
+just push     # build and push the image
+just release  # bump VERSION (commit + tag), then ask to build and push
+```
+
+Run it with the `.env` file:
+
+```sh
+docker run -d --env-file .env -p 8080:8080 <image>:latest
+```
+
 ### Uberspace
 
 ```sh

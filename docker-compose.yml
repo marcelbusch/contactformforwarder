@@ -1,0 +1,8 @@
+services:
+  mailserver:
+    image: git.bl0cka.de/marcel/contactformforwarder:latest
+    build: .
+    environment:
+      PORT: ${PORT:-8080}
+    env_file: .env
+

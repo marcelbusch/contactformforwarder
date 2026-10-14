@@ -1,18 +1,20 @@
-import express from 'express'
-import nodemailer from 'nodemailer'
-import cors from 'cors'
-import dotenv from 'dotenv'
+import express from "express";
+import nodemailer from "nodemailer";
+import cors from "cors";
+import dotenv from "dotenv";
 import DOMPurify from "isomorphic-dompurify";
 
-dotenv.config()
+dotenv.config();
 
 const app = express();
 if (process.env.CORS) {
-  const origin = process.env.CORS.split(' ')
-  console.log('cors origin:', origin)
-  app.use(cors({
-    origin: origin
-  }))
+  const origin = process.env.CORS.split(" ");
+  console.log("cors origin:", origin);
+  app.use(
+    cors({
+      origin: origin,
+    }),
+  );
 } else {
   app.use(cors());
 }
@@ -24,6 +26,15 @@ const apikey = process.env.APIKEY;
 app.post("/log", async (req, res) => {
   console.log(req?.body);
   res.send("success");
+});
+
+app.get("/status", async (_req, res) => {
+  const test = await testMail();
+  if (test === true) {
+    res.status(200).send("OK")
+  } else {
+    res.status(503).send("SMTP test failed")
+  }
 });
 
 app.post("/contactformsubmit", async (req, res) => {
@@ -81,6 +92,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+async function testMail() {
+  try {
+    await transporter.verify();
+    console.log("Server is ready to take our messages");
+    return true
+  } catch (err) {
+    console.error("Verification failed", err);
+    return err
+  }
+}
+
 function createMessage(data, template) {
   // console.log(template, data)
   if (!template) {
@@ -108,14 +130,10 @@ async function sendmail(data) {
     subject = data.subject;
   } else {
     if (data.template) {
-      messagetemplate = process.env.hasOwnProperty(
-        `MESSAGE_TEMPLATE_${data.template}`,
-      )
+      messagetemplate = process.env.hasOwnProperty(`MESSAGE_TEMPLATE_${data.template}`)
         ? process.env[`MESSAGE_TEMPLATE_${data.template}`]
         : null;
-      subjecttemplate = process.env.hasOwnProperty(
-        `SUBJECT_TEMPLATE_${data.template}`,
-      )
+      subjecttemplate = process.env.hasOwnProperty(`SUBJECT_TEMPLATE_${data.template}`)
         ? process.env[`SUBJECT_TEMPLATE_${data.template}`]
         : null;
     } else if (
@@ -145,7 +163,7 @@ async function sendmail(data) {
           : "Kontaktformular",
     );
   }
-  const sendto = process.env.ENVIRONMENT === 'DEVELOPMENT' && data?.to || process.env.SENDTO;
+  const sendto = (process.env.ENVIRONMENT === "DEVELOPMENT" && data?.to) || process.env.SENDTO;
   const msgdata = {
     from: `"Kontaktformular" <${process.env.MAILUSER}>`, // sender address
     to: sendto, // list of receivers
@@ -181,7 +199,7 @@ async function sendmail(data) {
     }
     if (send === true) {
       const confirmationInfo = await transporter.sendMail(msgdata);
-      console.log('confirmation sent info:', confirmationInfo)
+      console.log("confirmation sent info:", confirmationInfo);
     }
   }
 
